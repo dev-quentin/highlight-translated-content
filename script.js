@@ -23,7 +23,7 @@ const rtlLocales = ["ar-SA"];
 
 // Retrieve configuration
 const config = getConfig();
-console.info('Crunchyroll Mod Menu locale: ' + config.locale);
+console.info('Crunchyroll Mod Menu locale: ' + translations[config.locale]);
 
 // Array to store all fetched animes
 var allAnimes = [];
