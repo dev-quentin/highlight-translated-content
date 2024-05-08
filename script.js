@@ -49,13 +49,16 @@ observer.observe(targetNode, { attributes: false, childList: true, subtree: true
 
 // Style for browse cards
 const style = document.createElement('style');
+const opacityNotTranslated = config.hiddenNotTranslated ? '0' : '0.25';
+const opacityHoverNotTranslated = config.hiddenNotTranslated ? '0' : '1';
+
 style.innerHTML = `
 .browse-card[data-translated="false"] {
-    opacity: 0.25 !important;
+    opacity: ${opacityNotTranslated} !important;
 }
 
 .browse-card[data-translated="false"]:hover {
-    opacity: 1 !important;
+    opacity: ${opacityHoverNotTranslated} !important;
 }
 `;
 
@@ -76,7 +79,6 @@ window.XMLHttpRequest = () => { throw new Error('XMLHttpRequest is disabled.') }
 window.XMLHttpRequest = class XMLHttpRequestProxy extends originalXMLHttpRequest {
 
     filterResult = false;
-    newResponseText = null;
 
     constructor() {
         super();
@@ -151,8 +153,6 @@ function fetchBrowseCard(anime) {
 
 // Function to observe changes in the collection of browse cards
 function observeCollection(collectionNode) {
-    const config = { attributes: false, childList: true, subtree: true };
-
     const callback = function (mutationList, observer) {
         for (const anime of allAnimes) {
             const node = fetchBrowseCard(anime);
@@ -164,12 +164,15 @@ function observeCollection(collectionNode) {
                 node.setAttribute('data-translated', 'true');
             } else {
                 node.setAttribute('data-translated', 'false');
+                if (config.hiddenNotTranslated) {
+                    addOverlay(node);
+                }
             }
         }
     }
 
     const observer = new MutationObserver(callback);
-    observer.observe(collectionNode, config);
+    observer.observe(collectionNode, { attributes: false, childList: true, subtree: true });
 }
 
 // Function to retrieve configuration from sessionStorage
@@ -181,6 +184,7 @@ function getConfig() {
 
     return {
         locale: defaultLocale,
+        hiddenNotTranslated: false,
     };
 }
 
@@ -230,8 +234,14 @@ function makeModMenu() {
     const figure = document.createElement('figure');
 
     const legend = document.createElement('legend');
-    legend.innerHTML = "<label for='locale-select'><strong>Select audio language :</strong></label>";
+    legend.innerHTML = "<strong>Parameters :</strong>";
+    
+    const div4 = document.createElement('div');
 
+    const selectLable = document.createElement('label');
+    selectLable.setAttribute("for", "locale-select");
+    selectLable.innerHTML = "<strong>Select language :</strong>";
+    
     const select = document.createElement('select');
     select.setAttribute('id', 'locale-select');
     select.setAttribute('name', 'locale-select');
@@ -250,7 +260,25 @@ function makeModMenu() {
         }
         select.appendChild(option);
     }
+    
+    const div5 = document.createElement('div');
 
+    const checkLable = document.createElement('label');
+    checkLable.setAttribute("for", "hidden-not-translated");
+    checkLable.innerHTML = "<strong>Hide not translated :</strong>";
+
+    const check = document.createElement('input');
+    check.setAttribute('id', 'hidden-not-translated');
+    check.setAttribute('name', 'hidden-not-translated');
+    check.setAttribute('type', 'checkbox');
+    check.style.margin = '15px auto';
+    check.checked = config.hiddenNotTranslated ? true : false;
+    
+    const div6 = document.createElement('div');
+    div6.style.display = 'flex';
+    div6.style.justifyContent = 'end';
+    div6.style.marginBottom = '20px';
+    
     const button = document.createElement('button');
     button.type = 'button';
     button.innerText = 'Apply';
@@ -263,13 +291,25 @@ function makeModMenu() {
 
     button.addEventListener('click', function () {
         const selectedLocale = select.value;
-        setConfig({ locale: selectedLocale });
+        setConfig({
+            locale: selectedLocale,
+            hiddenNotTranslated: check.checked,
+        });
         window.location.reload();
     })
 
+    div4.appendChild(selectLable);
+    div4.appendChild(select);
+
+    div5.appendChild(checkLable);
+    div5.appendChild(check);
+
+    div6.appendChild(button);
+    
     figure.appendChild(legend);
-    figure.appendChild(select);
-    figure.appendChild(button);
+    figure.appendChild(div4);
+    figure.appendChild(div5);
+    figure.appendChild(div6);
 
     div3.appendChild(figure);
 
@@ -293,7 +333,6 @@ function makeModMenu() {
 // Function to switch the display of the mod menu
 function switchDisplayModMenu() {
     const div = document.getElementById('popup1');
-    const selectLocale = document.getElementById('locale-select');
 
     if (div.style.visibility === 'visible') {
         div.style.visibility = 'hidden';
@@ -305,5 +344,24 @@ function switchDisplayModMenu() {
         div.focus();
     }
 
+    const selectLocale = document.getElementById('locale-select');
     selectLocale.value = config.locale;
+    const check = document.getElementById('hidden-not-translated');
+    check.checked = config.hiddenNotTranslated ? true : false;
+}
+
+function addOverlay(node) {
+    const anime = allAnimes.find(anime => anime.id === node.id.replace('anime-', ''));
+
+    const img = document.createElement('img');
+    img.style.top = node.offsetTop + 'px';
+    img.style.left = node.offsetLeft + 'px';
+    img.style.position = 'absolute';
+    img.style.border = '1px solid #333';
+
+    img.loading = "lazy";
+    img.title = anime.title;
+    img.src = `https://placehold.co/${node.offsetWidth}x${node.offsetHeight}/000000/FFF?text=Not+Translated`;
+
+    document.body.appendChild(img);
 }
