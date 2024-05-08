@@ -2,9 +2,6 @@
 // @name        Highlight translated Content
 // @namespace   Violentmonkey Scripts
 // @match       https://www.crunchyroll.com/*/videos/popular
-// @match       https://www.crunchyroll.com/*/videos/new
-// @match       https://www.crunchyroll.com/*/videos/alphabetical
-// @match       https://www.crunchyroll.com/*/simulcasts/seasons/*
 // @grant       none
 // @version     1.0
 // @author      dev-quentin
@@ -37,7 +34,7 @@ const observer = new MutationObserver(function (mutationList, observer) {
     for (const mutation of mutationList) {
         if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
             for (const node of mutation.addedNodes) {
-                if (node.className.includes('erc-browse-collection')) {
+                if (node.nodeName === "DIV" && node.className.includes('erc-browse-collection')) {
                     observeCollection(node);
                     observer.disconnect();
                 }
