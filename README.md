@@ -25,4 +25,4 @@ Installing Violentmonkey Extension
 
 1. After adding the script, reload the Crunchyroll page where you want to use the script.
 2. Violentmonkey will automatically run the script.
-3. To open the mod menu, press "Insert".
+3. To open or close the mod menu, press "Insert".
