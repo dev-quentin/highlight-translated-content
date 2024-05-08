@@ -10,13 +10,16 @@
 // Default locale and translations
 const defaultLocale = "n/a";
 const locales = [
-    "n/a", "hi-IN", "ta-IN", "pt-BR", "es-419", "de-DE", "te-IN", "en-US", "es-ES", "ja-JP", "ko-KR", "it-IT", "fr-FR"
+    "n/a", "hi-IN", "ta-IN", "pt-BR", "es-419", "de-DE", "te-IN", "en-US", "es-ES", "ja-JP", "ko-KR", "it-IT", "fr-FR",
+    "ms-MY", "ar-SA", "id-ID", "th-TH", "ru-RU", "vi-VN"
 ];
 const translations = {
-    "n/a": "All", "hi-IN": "हिंदी", "ta-IN": "தமிழ்", "pt-BR": "Português", "es-419": "Espanol", "de-DE": "Deutsch",
-    "te-IN": "తెలుగు", "en-US": "English", "es-ES": "Espanol", "ja-JP": "日本語", "ko-KR": "한국어", "it-IT": "Italiano",
-    "fr-FR": "Français"
+    "n/a": "All", "hi-IN": "हिंदी", "ta-IN": "தமிழ்", "pt-BR": "Português (Brasil)", "es-419": "Espanol (América Latina)", "de-DE": "Deutsch",
+    "te-IN": "తెలుగు", "en-US": "English (US)", "es-ES": "Espanol (Espana)", "ja-JP": "日本語", "ko-KR": "한국어", "it-IT": "Italiano",
+    "fr-FR": "Français", "ms-MY": "Melayu", "ar-SA": "عربي", "id-ID": "Indonesia", "th-TH": "ไทย", "ru-RU": "Русский",
+    "vi-VN": "Vietnamese"
 };
+const rtlLocales = ["ar-SA"];
 
 // Retrieve configuration
 const config = getConfig();
@@ -227,7 +230,7 @@ function makeModMenu() {
     const figure = document.createElement('figure');
 
     const legend = document.createElement('legend');
-    legend.innerHTML = "<label for='locale-select'><strong>Select the locale :</strong></label>";
+    legend.innerHTML = "<label for='locale-select'><strong>Select audio language :</strong></label>";
 
     const select = document.createElement('select');
     select.setAttribute('id', 'locale-select');
@@ -235,13 +238,16 @@ function makeModMenu() {
     select.style.margin = '15px auto';
     select.style.background = '#fff';
     select.style.borderRadius = '5px';
-    select.style.width = '30%';
+    select.style.width = '50%';
 
     for (const locale of locales) {
         const option = document.createElement('option');
         option.value = locale;
         option.innerText = translations[locale];
         option.selected = config.locale === locale;
+        if (rtlLocales.includes(locale)) {
+            option.setAttribute('dir', 'rtl');
+        }
         select.appendChild(option);
     }
 
@@ -260,7 +266,7 @@ function makeModMenu() {
         setConfig({ locale: selectedLocale });
         window.location.reload();
     })
-    
+
     figure.appendChild(legend);
     figure.appendChild(select);
     figure.appendChild(button);
@@ -288,7 +294,7 @@ function makeModMenu() {
 function switchDisplayModMenu() {
     const div = document.getElementById('popup1');
     const selectLocale = document.getElementById('locale-select');
-    
+
     if (div.style.visibility === 'visible') {
         div.style.visibility = 'hidden';
         div.style.opacity = '0';
