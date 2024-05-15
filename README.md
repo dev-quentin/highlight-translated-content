@@ -23,6 +23,6 @@ Installing Violentmonkey Extension
 
 ## Activating the Script
 
-1. After adding the script, reload the Crunchyroll page where you want to use the script.
+1. After adding the script, reload the Crunchyroll page, then go to the "Most popular anime" page to use the script.
 2. Violentmonkey will automatically run the script.
 3. To open or close the mod menu, press "Insert".
